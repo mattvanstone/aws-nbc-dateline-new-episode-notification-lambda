@@ -1,0 +1,84 @@
+version: 2.1
+# Jobs must be added to the workflow at the bottom to be run
+jobs:
+  # Installs and runs repo-supervisor
+  repo-supervisor:
+    docker:
+      - image: node:8-stretch
+    steps:
+      - checkout 
+      - run:
+          name: Install repo-supervisor
+          command: |-
+            cd ../ && git clone https://github.com/auth0/repo-supervisor.git && cd repo-supervisor
+            npm install --no-optional
+            npm run build
+      - run:
+          name: Run repo-supervisor
+          command: cd ../repo-supervisor && npm run cli ../project/
+
+  # Installs and runs terrascan
+  # This terrascan job always fails      
+  terrascan:
+    docker:
+      - image: python:3.7-stretch
+    steps:
+      - checkout
+      - run: pip install terrascan
+      - run: terrascan --location . --tests all
+  # Creates backend resources with local state, then copies local state to remote backend.
+  # Only run once! Recommend deleting this job after backend is initialized.
+  initialize:
+    docker:
+      - image: hashicorp/terraform:0.12.1
+    steps:
+      - checkout
+      - run: 
+          name: Deploy backend with local state
+          command: |-
+            # Move backend config file to tmp/, forcing terraform to use local backend
+            mv backend.tf /tmp/
+            terraform init
+            terraform apply -auto-approve
+      - run:
+          name: Sync state with remote backend
+          command: |-
+            # Move backend config file back
+            mv /tmp/backend.tf .
+            # Initiliaze terraform, forcing the local state data to be copied to the now available remote backend
+            terraform init -force-copy
+  # Initializes and runs Terraform
+  deploy:
+    docker:
+      - image: hashicorp/terraform:0.12.1
+    steps:
+      - checkout
+      - run: terraform init
+      - run: terraform apply -auto-approve
+
+workflows:
+    flow:
+        jobs:
+            - repo-supervisor
+            #- terrascan
+            - initialize:
+                # Context supplies environment variables
+                context: dcnetwork-sandbox
+                # Only run if the branch is called "feature/implement"
+                # To initilaize the pipeline, "implement" the backend resources in backend.tf and main.tf, then commit and push to this branch
+                # Only push to this branch once!
+                filters:
+                  branches:
+                    only:
+                      - feature/implement
+            - deploy:
+                context: dcnetwork-sandbox
+                # Only run this job on the master branch
+                filters:
+                  branches:
+                     only:
+                       - master
+                # Don't run if the repo-supervisor or terrascan jobs fail
+                requires:
+                  - repo-supervisor
+                  #- terrascan
