@@ -85,7 +85,6 @@ workflows:
                   branches:
                      only:
                        - master
-                       - feature/driftdetection
                 # Don't run if the repo-supervisor or terrascan jobs fail
                 requires:
                   - repo-supervisor
