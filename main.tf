@@ -6,7 +6,7 @@ provider "aws" {
 #### Backend Bucket ####
 resource "aws_s3_bucket" "tf-state-bucket" {
   # Update backend.tf with new value
-  bucket = "aws-matt-lambda-state-bucket"
+  bucket = "aws-dateline-lambda-state-bucket"
   versioning {
     enabled = true
   }
@@ -19,7 +19,7 @@ resource "aws_s3_bucket" "tf-state-bucket" {
 #### Backend Dynamodb Table ####
 resource "aws_dynamodb_table" "tf-state-table" {
   # Update backend.tf with new value
-  name         = "aws-matt-lambda-state"
+  name         = "aws-dateline-lambda-state"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "LockID"
   attribute {
@@ -63,7 +63,7 @@ resource "aws_cloudwatch_log_group" "example" {
 
 resource "aws_dynamodb_table" "episode-table" {
   # Update backend.tf with new value
-  name         = "matt-lambda"
+  name         = "dateline-lambda"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "internalId"
   attribute {
@@ -82,7 +82,7 @@ data "archive_file" "lambda_zip" {
 
 resource "aws_lambda_function" "test_lambda" {
   filename         = "lambda.zip"
-  function_name    = "matt-lambda"
+  function_name    = "dateline-lambda"
   role             = "${aws_iam_role.lambdarole.arn}"
   handler          = "lambda.handler"
   timeout          = 60
@@ -109,7 +109,7 @@ resource "aws_cloudwatch_event_rule" "every_hour" {
 
 resource "aws_cloudwatch_event_target" "check_foo_every_five_minutes" {
   rule      = "${aws_cloudwatch_event_rule.every_hour.name}"
-  target_id = "matt-lambda"
+  target_id = "dateline-lambda"
   arn       = "${aws_lambda_function.test_lambda.arn}"
 }
 
@@ -121,7 +121,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_check_foo" {
   source_arn    = "${aws_cloudwatch_event_rule.every_hour.arn}"
 }
 
-resource "aws_resourcegroups_group" "matt-lambda" {
+resource "aws_resourcegroups_group" "dateline-lambda" {
   name = "rg-${var.pipeline-name}"
 
   resource_query {
