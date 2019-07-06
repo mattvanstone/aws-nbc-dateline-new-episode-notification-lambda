@@ -55,6 +55,13 @@ jobs:
       - checkout
       - run: terraform init
       - run: terraform apply -auto-approve
+  detectdrift:
+    docker:
+      - image: hashicorp/terraform:0.12.1
+    steps:
+      - checkout
+      - run: terraform init
+      - run: terraform plan -detailed-exitcode 
 
 workflows:
     flow:
@@ -78,6 +85,18 @@ workflows:
                   branches:
                      only:
                        - master
+                       - feature/driftdetection
+                # Don't run if the repo-supervisor or terrascan jobs fail
+                requires:
+                  - repo-supervisor
+                  #- terrascan
+            - detectdrift:
+                context: dateline-lambda
+                # Only run this job on the master branch
+                filters:
+                  branches:
+                     only:
+                       - feature/driftdetection
                 # Don't run if the repo-supervisor or terrascan jobs fail
                 requires:
                   - repo-supervisor
