@@ -63,7 +63,7 @@ workflows:
             #- terrascan
             - initialize:
                 # Context supplies environment variables
-                context: dcnetwork-sandbox
+                context: dateline-lambda
                 # Only run if the branch is called "feature/implement"
                 # To initilaize the pipeline, "implement" the backend resources in backend.tf and main.tf, then commit and push to this branch
                 # Only push to this branch once!
@@ -72,7 +72,7 @@ workflows:
                     only:
                       - feature/implement
             - deploy:
-                context: dcnetwork-sandbox
+                context: dateline-lambda
                 # Only run this job on the master branch
                 filters:
                   branches:

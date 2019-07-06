@@ -66,7 +66,7 @@ If you run steps 4 and 5 you will not be able to run `terraform destroy` without
 
 ### Deploy with CircleCI
 Follow these instructions to deploy the project using CircleCI.
-1. Create a context with your **AWS_ACCESS_KEY_ID** and **AWS_SECRET_ACCESS_KEY**
+1. Create a new context called **dateline-lambda** with your **AWS_ACCESS_KEY_ID** and **AWS_SECRET_ACCESS_KEY**
 2. Update **config.yml** to use your context
 3. Create the following environment variables in your CircleCI project for your TVDB api keys and SMS phone number. (https://api.thetvdb.com/swagger)
     * TF_VAR_apikey
