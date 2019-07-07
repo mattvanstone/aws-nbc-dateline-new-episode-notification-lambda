@@ -103,11 +103,11 @@ workflows:
     driftdetect:
         triggers:
           - schedule:
-              cron: "42 0 * * *"
+              cron: "48 0 * * *"
               filters:
                 branches:
                   only:
-                    - feature/implement
+                    - feature/driftdetection
         jobs:
             - detectdrift:
                 context: dateline-lambda
