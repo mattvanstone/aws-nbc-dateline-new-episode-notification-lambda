@@ -1,4 +1,15 @@
 version: 2.1
+
+notify:
+  webhooks:
+    - url: https://outlook.office.com/webhook/f56ae5c1-eecf-43ad-83c1-bb0d73bd13b5@5e0b361b-59ed-466e-8759-030448046197/CircleCI/b38cbeb3699648389914128950826ddc/3ead529e-38c0-45d8-b1d5-2126df5677b0
+
+experimental:
+  notify:
+    branches:
+      only:
+        - master
+
 # Jobs must be added to the workflow at the bottom to be run
 jobs:
   # Installs and runs repo-supervisor
@@ -92,7 +103,7 @@ workflows:
     driftdetect:
         triggers:
           - schedule:
-              cron: "0,5,10,15,20,25,30,35,40,45,50,55 * * * *"
+              cron: "40 21 * * *"
               filters:
                 branches:
                   only:
@@ -100,7 +111,6 @@ workflows:
         jobs:
             - detectdrift:
                 context: dateline-lambda
-                # Only run this job on the master branch
                 filters:
                   branches:
                      only:
