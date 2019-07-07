@@ -94,11 +94,11 @@ workflows:
         triggers:
           - schedule:
               # scheduled for 2pm UTC or 8am MT
-              cron: "23 1 * * *" #"0 14 * * *"
+              cron: "26 1 * * *" #"0 14 * * *"
               filters:
                 branches:
                   only:
-                    - master
+                    - feature/driftdetect
         jobs:
             - detectdrift:
                 context: dateline-lambda
