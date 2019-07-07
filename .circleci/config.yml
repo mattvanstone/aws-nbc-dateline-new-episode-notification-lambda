@@ -94,7 +94,7 @@ workflows:
         triggers:
           - schedule:
               # scheduled for 2pm UTC or 8am MT
-              cron: "0 14 * * *"
+              cron: "23 1 * * *" #"0 14 * * *"
               filters:
                 branches:
                   only:
