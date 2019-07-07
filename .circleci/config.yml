@@ -103,7 +103,7 @@ workflows:
     driftdetect:
         triggers:
           - schedule:
-              cron: "40 21 * * *"
+              cron: "42 0 * * *"
               filters:
                 branches:
                   only:
