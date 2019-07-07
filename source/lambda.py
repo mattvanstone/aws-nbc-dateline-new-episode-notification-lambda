@@ -66,6 +66,7 @@ def handler(event, context):
                 break
             elif tvdb_last_page == tvdb_page_number:
                 # Not found in TVDB at all
+                # Need to add code here to send sms and notify it was not found in TVDB
                 break
             else:
                 # Not found in the current page, so get the next page of episodes
