@@ -89,6 +89,15 @@ workflows:
                 requires:
                   - repo-supervisor
                   #- terrascan
+    driftdetect:
+        triggers:
+          - schedule:
+              cron: "*/5 * * * *"
+              filters:
+                branches:
+                  only:
+                    - feature/implement
+        jobs:
             - detectdrift:
                 context: dateline-lambda
                 # Only run this job on the master branch
@@ -96,7 +105,3 @@ workflows:
                   branches:
                      only:
                        - feature/driftdetection
-                # Don't run if the repo-supervisor or terrascan jobs fail
-                requires:
-                  - repo-supervisor
-                  #- terrascan
