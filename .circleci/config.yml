@@ -1,4 +1,5 @@
 version: 2.1
+
 # Jobs must be added to the workflow at the bottom to be run
 jobs:
   # Installs and runs repo-supervisor
@@ -55,6 +56,13 @@ jobs:
       - checkout
       - run: terraform init
       - run: terraform apply -auto-approve
+  detectdrift:
+    docker:
+      - image: hashicorp/terraform:0.12.1
+    steps:
+      - checkout
+      - run: terraform init
+      - run: terraform plan -detailed-exitcode 
 
 workflows:
     flow:
@@ -82,3 +90,15 @@ workflows:
                 requires:
                   - repo-supervisor
                   #- terrascan
+    driftdetect:
+        triggers:
+          - schedule:
+              # scheduled for 2pm UTC or 8am MT
+              cron: "0 14 * * *"
+              filters:
+                branches:
+                  only:
+                    - master
+        jobs:
+            - detectdrift:
+                context: dateline-lambda
