@@ -52,10 +52,27 @@ def handler(event, context):
         while True:
             out = next((item for item in episode_data if item.get("episodeName") and item["episodeName"].lower() == episode['attributes']['title'].lower()), None)
             if out:
-                print('Dateline NBC - S' + str(out['airedSeason']).zfill(2) + 'E' + str(out['airedEpisodeNumber']).zfill(2) + ' - ' + out['episodeName'])
+                # The episode was found in TheTVDB
+                episode_filename = 'Dateline NBC - S' + str(out['airedSeason']).zfill(2) + 'E' + str(out['airedEpisodeNumber']).zfill(2) + ' - ' + out['episodeName']
+                print(episode_filename)
+                send = True
+            elif tvdb_last_page == tvdb_page_number:
+                # Not found in TVDB at all
+                episode_filename = 'Dateline NBC - S??E?? - ' + out['episodeName']
+                print(episode_filename)
+                send = True
+            else:
+                # Not found in the current page, so get the next page of episodes
+                # Add the new episode_data list to the existing list so that it can be reused for subsequent loops
+                tvdb_page_number += 1
+                episode_page = get_tvdb_page(tvdb_series_id, tvdb_page_number, auth_token)
+                episode_data = episode_data + episode_page['data']
+
+            # add to the db and send a notification if there is an episode found
+            if send == True:
                 result = dynamo_put_episode(table_name, episode, region_name)
                 if result == "success":
-                    sns_message = 'New Episode: Dateline NBC - S' + str(out['airedSeason']).zfill(2) + 'E' + str(out['airedEpisodeNumber']).zfill(2) + ' - ' + out['episodeName'] + '\n' + episode['attributes']['fullUrl']
+                    sns_message = episode_filename + '\n' + episode['attributes']['fullUrl']
                     sms_send_message(topic_arn, sns_message, region_name)
                 elif result == "failure":
                     pass
@@ -64,16 +81,6 @@ def handler(event, context):
                 else:
                     pass
                 break
-            elif tvdb_last_page == tvdb_page_number:
-                # Not found in TVDB at all
-                # Need to add code here to send sms and notify it was not found in TVDB
-                break
-            else:
-                # Not found in the current page, so get the next page of episodes
-                # Add the new episode_data list to the existing list so that it can be reused for subsequent loops
-                tvdb_page_number += 1
-                episode_page = get_tvdb_page(tvdb_series_id, tvdb_page_number, auth_token)
-                episode_data = episode_data + episode_page['data']
 
 def dynamo_put_episode(table, episode, region_name):
     dynamodb = boto3.resource("dynamodb", region_name=region_name)
