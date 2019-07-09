@@ -59,7 +59,7 @@ def handler(event, context):
                 send = True
             elif tvdb_last_page == tvdb_page_number:
                 # Not found in TVDB at all
-                episode_filename = 'Dateline NBC - S??E?? - ' + out['episodeName']
+                episode_filename = 'Dateline NBC - S??E?? - ' + episode['attributes']['title']
                 print(episode_filename)
                 send = True
             else:
