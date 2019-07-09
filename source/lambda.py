@@ -50,6 +50,7 @@ def handler(event, context):
     # If the episode already exists in the DynamoDB table then do nothing
     for episode in nbc_episodes['data']:
         while True:
+            send = False
             out = next((item for item in episode_data if item.get("episodeName") and item["episodeName"].lower() == episode['attributes']['title'].lower()), None)
             if out:
                 # The episode was found in TheTVDB
